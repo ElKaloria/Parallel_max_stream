@@ -1,1 +1,1 @@
-#Parallel and Jit max-stream algorithm 
+Parallel and Jit max-stream algorithm 
