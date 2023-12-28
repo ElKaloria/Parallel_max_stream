@@ -6,6 +6,9 @@ import time
 from functools import wraps
 import click
 
+MATR_SIZE = 150
+
+
 @click.group()
 def cli():
     pass
@@ -155,6 +158,7 @@ def Dijkstra_alg(graph, pos:int) -> (np.int64, np.array(int)):
     # print(m)
     return (k, path)
 
+
 #@timing
 @numba.njit(cache=True)
 def Dijkstra_alg_jit(graph, pos:int) -> (np.int64, np.array(int)):
@@ -213,6 +217,7 @@ def Dijkstra_alg_jit(graph, pos:int) -> (np.int64, np.array(int)):
     #     print(int(path[i]), end=" -> ")
     # print(m)
     return (k, path)
+
 
 #@timing
 @numba.njit(parallel=True, cache=True)
@@ -274,6 +279,7 @@ def Dijkstra_alg_parallel(graph, pos:int):
 
     return (k, path)
 
+
 def create_stream_matr(graph):
     n = len(graph[0])
     stream = np.zeros((n,n))
@@ -283,6 +289,7 @@ def create_stream_matr(graph):
                 stream[i][j] = np.inf
 
     return stream
+
 
 @numba.njit(cache=True)
 def create_stream_matr_jit(graph):
@@ -294,6 +301,7 @@ def create_stream_matr_jit(graph):
                 stream[i][j] = np.inf
 
     return stream
+
 
 @numba.njit(parallel=True, cache=True)
 def create_stream_matr_parallel(graph):
@@ -424,28 +432,30 @@ def max_stream_alg_parallel(graph) -> np.array((int, int)):
 
     return stream
 
+
 @cli.command()
 @click.option('--jit/--no-jit', default=False)
 def jit_test(jit):
     if jit:
         click.echo(click.style('Running with JIT', fg='green'))
-        graph = create_full_planar_graph_jit(100)
+        graph = create_full_planar_graph_jit(MATR_SIZE)
         max_stream_alg_jit(graph)
     else:
         click.echo(click.style('Running NO JIT', fg='red'))
-        graph = create_full_planar_graph(100)
+        graph = create_full_planar_graph(MATR_SIZE)
         max_stream_alg(graph)
+
 
 @cli.command()
 @click.option('--threads/--no-jit', default=False)
 def threads_test(threads):
     if threads:
         click.echo(click.style('Running with multicore threads', fg='yellow'))
-        graph = create_full_planar_graph_parallel(100)
+        graph = create_full_planar_graph_parallel(MATR_SIZE)
         max_stream_alg_parallel(graph)
     else:
         click.echo(click.style('Running NO JIT', fg='red'))
-        graph = create_full_planar_graph(100)
+        graph = create_full_planar_graph(MATR_SIZE)
         max_stream_alg(graph)
 
 if __name__ == '__main__':
